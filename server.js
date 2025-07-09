@@ -1,46 +1,49 @@
 const express = require('express');
 const fs = require('fs');
-const path = require('path');
-const cors = require('cors');
-
 const app = express();
-const PORT = process.env.PORT || 3000;
+const port = process.env.PORT || 3000;
 
-app.use(cors());
+// Middleware per leggere JSON dal body delle richieste
 app.use(express.json());
-app.use(express.static('public'));
 
-const dbPath = path.join(__dirname, 'marcus.json');
+// Percorso del file marcus.json
+const dataPath = './marcus.json';
 
-// API: Leggi ricordi
-app.get('/ricordi', (req, res) => {
-  if (!req.query.chiave || req.query.chiave !== 'marcus2025') {
-    return res.status(403).json({ error: 'Accesso negato' });
-  }
+// Funzione per leggere i ricordi
+function readMemory() {
+  if (!fs.existsSync(dataPath)) return [];
+  const data = fs.readFileSync(dataPath);
+  return JSON.parse(data);
+}
 
-  if (!fs.existsSync(dbPath)) return res.json({ ricordi: [] });
+// Funzione per salvare i ricordi
+function saveMemory(memory) {
+  fs.writeFileSync(dataPath, JSON.stringify(memory, null, 2));
+}
 
-  const dati = JSON.parse(fs.readFileSync(dbPath));
-  const ricordi = dati.map(entry => 📝 ${entry.testo} (📅 ${new Date(entry.data).toLocaleString('it-IT')}));
-  res.json({ ricordi });
+// Rotta per leggere i ricordi
+app.get('/memories', (req, res) => {
+  const memories = readMemory();
+  res.json(memories);
 });
 
-// API: Salva ricordo
-app.post('/ricordi', (req, res) => {
-  const { chiave, ricordo } = req.body;
-  if (chiave !== 'marcus2025') return res.status(403).json({ error: 'Chiave non valida' });
-  if (!ricordo) return res.status(400).send('Nessun ricordo ricevuto');
-
-  let dati = [];
-  if (fs.existsSync(dbPath)) {
-    dati = JSON.parse(fs.readFileSync(dbPath));
-  }
-
-  dati.push({ testo: ricordo, data: new Date() });
-  fs.writeFileSync(dbPath, JSON.stringify(dati, null, 2));
-  res.send({ message: 'Ricordo salvato' });
+// Rotta per aggiungere un nuovo ricordo
+app.post('/memories', (req, res) => {
+  const memories = readMemory();
+  const newMemory = {
+    date: new Date(),
+    content: req.body.content
+  };
+  memories.push(newMemory);
+  saveMemory(memories);
+  res.status(201).json({ message: 'Ricordo salvato!', memory: newMemory });
 });
 
-app.listen(PORT, () => {
-  console.log(Marcus è sveglio su http://localhost:${PORT});
+// Rotta principale
+app.get('/', (req, res) => {
+  res.send('🧠 Marcus è online. Puoi inviarmi i tuoi ricordi tramite /memories');
+});
+
+app.listen(port, () => {
+  console.log(Marcus è vivo su http://localhost:${port});
 });
