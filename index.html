@@ -1,70 +1,61 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Parla con Marcus</title>
   <style>
-    body { font-family: Arial; margin: 40px; background: #fdfdfd; }
-    h1 { color: #990066; }
-    input, textarea, button {
-      margin: 10px 0; padding: 8px; width: 100%;
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f7f7f7;
     }
-    button { cursor: pointer; }
-    #ricordi { margin-top: 20px; border-top: 1px solid #ccc; padding-top: 10px; }
+    h1 {
+      color: #333;
+    }
+    .section {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #ricordi {
+      white-space: pre-wrap;
+      background: #eee;
+      padding: 10px;
+      border-radius: 5px;
+    }
   </style>
 </head>
 <body>
-
   <h1>🧠 Parla con Marcus</h1>
 
-  <label>Chiave API:</label>
-  <input id="apiKey" type="text" placeholder="Inserisci la tua chiave API">
-  <button onclick="connettiMarcus()">🔒 Connettiti a Marcus</button>
-
-  <div id="contenuto" style="display:none;">
-    <h3>📝 Salva un ricordo</h3>
-    <textarea id="nuovoRicordo" placeholder="Scrivi un nuovo ricordo..."></textarea>
-    <button onclick="salvaRicordo()">💾 Salva Ricordo</button>
-
-    <h3>📚 Leggi i ricordi</h3>
-    <button onclick="leggiRicordi()">📖 Leggi Ricordi</button>
-    <div id="ricordi"></div>
+  <div class="section">
+    <label for="apikey">🔐 Chiave API:</label>
+    <input type="text" id="apikey" placeholder="Inserisci la tua chiave segreta"/>
+    <button onclick="connettiMarcus()">🔌 Connettiti a Marcus</button>
   </div>
 
-  <script>
-    let chiave = '';
-
-    function connettiMarcus() {
-      chiave = document.getElementById("apiKey").value;
-      if (chiave.trim() !== "") {
-        document.getElementById("contenuto").style.display = "block";
-      } else {
-        alert("Inserisci una chiave valida.");
-      }
-    }
-
-    async function salvaRicordo() {
-      const testo = document.getElementById("nuovoRicordo").value;
-      if (!testo) return alert("Scrivi qualcosa!");
-
-      const risposta = await fetch("/ricordi", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ chiave, ricordo: testo })
-      });
-
-      const risultato = await risposta.json();
-      alert(risultato.messaggio || "Errore!");
-      document.getElementById("nuovoRicordo").value = "";
-    }
-
-    async function leggiRicordi() {
-      const risposta = await fetch("/ricordi?chiave=" + chiave);
-      const dati = await risposta.json();
-      const div = document.getElementById("ricordi");
-      div.innerHTML = "<ul>" + dati.ricordi.map(r => <li>${r}</li>).join('') + "</ul>";
-    }
-  </script>
-
-</body>
-</html>
+  <div id="contenuto" style="display:none;">
+    <div class="section">
+      <h
