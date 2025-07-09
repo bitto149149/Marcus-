@@ -1,12 +1,12 @@
 {
-  "name": "marcus-server",
+  "name": "marcus",
   "version": "1.0.0",
-  "description": "Il server personale di Marcus, l'intelligenza creata da Mirko.",
+  "description": "L'intelligenza personale di Mirko",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.18.2"
   }
 }
