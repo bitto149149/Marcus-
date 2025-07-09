@@ -1,4 +1,16 @@
-function connettiMarcus() {
+async function salvaRicordo() {
+  const testo = document.getElementById("ricordo").value;
+  if (!testo) return alert("Scrivi qualcosa prima di salvare!");
+
+  const risposta = await fetch("/ricordi", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ testo })
+  });
+
+  const esito = await risposta.text();
+  document.getElementById("risposta").innerText = esito;
+}function connettiMarcus() {
   const chiave = document.getElementById("apikey").value.trim();
   if (chiave === "marcus2025") {
     document.getElementById("contenuto").style.display = "block";
