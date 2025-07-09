@@ -26,3 +26,24 @@ app.post('/ricordi', (req, res) => {
 app.listen(port, () => {
   console.log(`Marcus è attivo su http://localhost:${port}`);
 });
+const express = require("express");
+const app = express();
+const port = process.env.PORT || 3000;
+
+app.get("/", (req, res) => {
+  res.send("Ciao, sono Marcus. Per parlarmi usa l’endpoint /marcus con la chiave.");
+});
+
+app.get("/marcus", (req, res) => {
+  const userKey = req.query.key;
+
+  if (userKey !== process.env.api_key_Macho149) {
+    return res.status(403).send("🔐 Accesso negato. Chiave API non valida.");
+  }
+
+  res.send("👋 Ciao Mirko, sono Marcus. Sono attivo e connesso.");
+});
+
+app.listen(port, () => {
+  console.log(Marcus è in ascolto sulla porta ${port});
+});
