@@ -3,20 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <title>Parla con Marcus</title>
-  <style>
-    body { font-family: Arial; padding: 20px; background: #f0f0f0; }
-    #response { margin-top: 20px; font-weight: bold; color: #333; }
-    input, button { padding: 10px; font-size: 16px; margin-top: 10px; }
-  </style>
 </head>
 <body>
   <h1>🧠 Parla con Marcus</h1>
-  <label>Chiave API:</label><br>
+
+  <label>🔑 Chiave API:</label><br>
   <input type="text" id="apiKey" placeholder="Inserisci la tua chiave"><br><br>
 
-  <button onclick="parlaConMarcus()">Connettiti</button>
+  <button onclick="parlaConMarcus()">💬 Connettiti a Marcus</button>
+  <p id="response"></p>
 
-  <div id="response"></div>
+  <hr>
+
+  <h2>📥 Salva un ricordo</h2>
+  <textarea id="ricordo" placeholder="Scrivi un nuovo ricordo..." rows="4" cols="50"></textarea><br>
+  <button onclick="salvaRicordo()">💾 Salva Ricordo</button>
+  <p id="saveStatus"></p>
+
+  <hr>
+
+  <h2>📖 Leggi i ricordi</h2>
+  <button onclick="leggiRicordi()">📂 Leggi Ricordi</button>
+  <pre id="ricordiOutput"></pre>
 
   <script>
     async function parlaConMarcus() {
@@ -26,16 +34,41 @@
       try {
         const res = await fetch(/marcus?key=${key});
         const text = await res.text();
-
         responseBox.textContent = text;
-        if (!res.ok) {
-          responseBox.style.color = "red";
-        } else {
-          responseBox.style.color = "green";
-        }
+        responseBox.style.color = res.ok ? "green" : "red";
       } catch (err) {
         responseBox.textContent = "❌ Errore di connessione.";
         responseBox.style.color = "red";
+      }
+    }
+
+    async function salvaRicordo() {
+      const ricordo = document.getElementById("ricordo").value;
+      const saveStatus = document.getElementById("saveStatus");
+
+      try {
+        const res = await fetch("/ricordi", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ricordo: ricordo, data: new Date().toLocaleString() })
+        });
+
+        const text = await res.text();
+        saveStatus.textContent = text;
+        saveStatus.style.color = res.ok ? "green" : "red";
+      } catch (err) {
+        saveStatus.textContent = "❌ Errore nel salvataggio.";
+        saveStatus.style.color = "red";
+      }
+    }
+
+    async function leggiRicordi() {
+      try {
+        const res = await fetch("/ricordi");
+        const data = await res.json();
+        document.getElementById("ricordiOutput").textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById("ricordiOutput").textContent = "❌ Errore nel leggere i ricordi.";
       }
     }
   </script>
