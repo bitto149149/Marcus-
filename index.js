@@ -41,3 +41,9 @@ app.post("/ricordi", (req, res) => {
 app.listen(port, () => {
   console.log(🚀 Marcus è in ascolto sulla porta ${port});
 });
+const path = require("path"); // <== AGGIUNGI QUESTO in alto se manca
+
+// Servi la pagina HTML
+app.get("/parla", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
