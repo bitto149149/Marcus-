@@ -5,16 +5,31 @@ function confermaAccesso() {
   const chiave = document.getElementById("keyInput").value;
   if (chiave === "marcus") {
     document.getElementById("contenuto").style.display = "block";
-    alert("Benvenuto, Mirko.");
+    parla("Benvenuto Mirko, sono pronto.");
   } else {
+    parla("Chiave non riconosciuta.");
     alert("Inserisci una chiave valida.");
   }
+}
+
+// Funzione per far parlare Marcus
+function parla(testo) {
+  const synth = window.speechSynthesis;
+  const voce = new SpeechSynthesisUtterance(testo);
+  voce.lang = "it-IT"; // Italiano
+  voce.pitch = 1;
+  voce.rate = 1;
+  voce.volume = 1;
+  synth.speak(voce);
 }
 
 // Funzione per salvare un ricordo
 async function salvaRicordo() {
   const testo = document.getElementById("nuovoRicordo").value;
-  if (!testo) return alert("Scrivi qualcosa!");
+  if (!testo) {
+    parla("Scrivi qualcosa prima di salvarlo.");
+    return alert("Scrivi qualcosa!");
+  }
 
   const risposta = await fetch("/ricordi", {
     method: "POST",
@@ -22,8 +37,8 @@ async function salvaRicordo() {
     body: JSON.stringify({ testo })
   });
 
-  const risultato = await risposta.json();
-  alert(risultato.message || "Ricordo salvato");
+  const risultato = await risposta.text();
+  parla("Ho memorizzato il tuo pensiero.");
   document.getElementById("nuovoRicordo").value = "";
   caricaRicordi();
 }
@@ -39,9 +54,10 @@ async function leggiRicordi() {
     .join("\n");
 }
 
-// Esegui appena la pagina è pronta
+// Caricamento iniziale dei ricordi
 function caricaRicordi() {
   leggiRicordi().catch(err => {
     console.error("Errore nel caricamento dei ricordi:", err);
+    parla("C'è stato un errore nel leggere i miei ricordi.");
   });
 }
