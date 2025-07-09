@@ -3,45 +3,30 @@ const fs = require('fs');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Middleware per leggere JSON dal body delle richieste
 app.use(express.json());
 
-// Percorso del file marcus.json
-const dataPath = './marcus.json';
+const FILE_PATH = 'marcus.json';
 
-// Funzione per leggere i ricordi
-function readMemory() {
-  if (!fs.existsSync(dataPath)) return [];
-  const data = fs.readFileSync(dataPath);
-  return JSON.parse(data);
-}
-
-// Funzione per salvare i ricordi
-function saveMemory(memory) {
-  fs.writeFileSync(dataPath, JSON.stringify(memory, null, 2));
-}
-
-// Rotta per leggere i ricordi
-app.get('/memories', (req, res) => {
-  const memories = readMemory();
-  res.json(memories);
+// Leggi i ricordi
+app.get('/ricordi', (req, res) => {
+  fs.readFile(FILE_PATH, (err, data) => {
+    if (err) return res.status(500).send('Errore nel leggere il file');
+    res.send(JSON.parse(data));
+  });
 });
 
-// Rotta per aggiungere un nuovo ricordo
-app.post('/memories', (req, res) => {
-  const memories = readMemory();
-  const newMemory = {
-    date: new Date(),
-    content: req.body.content
-  };
-  memories.push(newMemory);
-  saveMemory(memories);
-  res.status(201).json({ message: 'Ricordo salvato!', memory: newMemory });
-});
-
-// Rotta principale
-app.get('/', (req, res) => {
-  res.send('🧠 Marcus è online. Puoi inviarmi i tuoi ricordi tramite /memories');
+// Scrivi un nuovo ricordo
+app.post('/ricordi', (req, res) => {
+  const nuovoRicordo = req.body;
+  fs.readFile(FILE_PATH, (err, data) => {
+    let ricordi = [];
+    if (!err) ricordi = JSON.parse(data);
+    ricordi.push(nuovoRicordo);
+    fs.writeFile(FILE_PATH, JSON.stringify(ricordi, null, 2), err => {
+      if (err) return res.status(500).send('Errore nel salvare il ricordo');
+      res.send({ success: true });
+    });
+  });
 });
 
 app.listen(port, () => {
